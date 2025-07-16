@@ -1,0 +1,26 @@
+[
+  {
+    "CustomerID": "C001",
+    "CustomerName": "Alice",
+    "ProductName": "Product A",
+    "OrderDate": "2024-07-01",
+    "Sales": 120,
+    "Profit": 45
+  },
+  {
+    "CustomerID": "C001",
+    "CustomerName": "Alice",
+    "ProductName": "Product B",
+    "OrderDate": "2024-07-03",
+    "Sales": 80,
+    "Profit": 30
+  },
+  {
+    "CustomerID": "C002",
+    "CustomerName": "Bob",
+    "ProductName": "Product C",
+    "OrderDate": "2024-07-04",
+    "Sales": 150,
+    "Profit": 50
+  }
+]

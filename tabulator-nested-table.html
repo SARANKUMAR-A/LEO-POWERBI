@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Nested Table Example - Tabulator</title>
+  <!-- Tabulator CSS -->
+  <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator.min.css" rel="stylesheet">
+  
+  <!-- Tabulator JS -->
+  <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 40px;
+      background-color: #f5f7fa;
+    }
+
+    h2 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    #main-table {
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .sub-table {
+      padding: 15px;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+
+    .expand-btn {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .expand-btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h2>Customer Orders</h2>
+  <div id="main-table"></div>
+
+  <script>
+    // Sample JSON data
+    const data = [
+      {
+        CustomerID: "CUST001",
+        CustomerName: "Alice",
+        ProductName: "Laptop",
+        OrderDate: "2023-06-01",
+        Sales: 1500,
+        Profit: 300,
+      },
+      {
+        CustomerID: "CUST001",
+        CustomerName: "Alice",
+        ProductName: "Mouse",
+        OrderDate: "2023-06-05",
+        Sales: 50,
+        Profit: 10,
+      },
+      {
+        CustomerID: "CUST002",
+        CustomerName: "Bob",
+        ProductName: "Keyboard",
+        OrderDate: "2023-06-10",
+        Sales: 100,
+        Profit: 20,
+      },
+      {
+        CustomerID: "CUST003",
+        CustomerName: "Charlie",
+        ProductName: "Monitor",
+        OrderDate: "2023-06-15",
+        Sales: 300,
+        Profit: 60,
+      }
+    ];
+
+    // Group orders by Customer
+    const grouped = {};
+    data.forEach(row => {
+      if (!grouped[row.CustomerID]) {
+        grouped[row.CustomerID] = {
+          CustomerID: row.CustomerID,
+          CustomerName: row.CustomerName,
+          Orders: []
+        };
+      }
+      grouped[row.CustomerID].Orders.push({
+        ProductName: row.ProductName,
+        OrderDate: row.OrderDate,
+        Sales: row.Sales,
+        Profit: row.Profit
+      });
+    });
+
+    const tableData = Object.values(grouped);
+
+    // Create Main Tabulator Table
+    const mainTable = new Tabulator("#main-table", {
+      data: tableData,
+      layout: "fitColumns",
+      height: "500px",
+      columns: [
+        { title: "Customer ID", field: "CustomerID" },
+        { title: "Customer Name", field: "CustomerName" },
+        {
+          title: "Orders",
+          formatter: () => "<button class='expand-btn'>View Orders</button>",
+          width: 150,
+          cellClick: function (e, cell) {
+            const existing = cell.getRow().getElement().nextSibling;
+            if (existing && existing.classList.contains("sub-table")) {
+              existing.remove(); // Collapse if already open
+              return;
+            }
+
+            // Remove all open sub-tables
+            document.querySelectorAll(".sub-table").forEach(el => el.remove());
+
+            const orders = cell.getRow().getData().Orders;
+            const wrapper = document.createElement("div");
+            wrapper.className = "sub-table";
+            cell.getRow().getElement().after(wrapper);
+
+            new Tabulator(wrapper, {
+              data: orders,
+              layout: "fitColumns",
+              autoColumns: true,
+              height: "auto",
+            });
+          }
+        }
+      ]
+    });
+  </script>
+</body>
+</html>
