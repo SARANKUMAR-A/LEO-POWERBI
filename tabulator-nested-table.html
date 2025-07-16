@@ -1,93 +1,84 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Customer Orders - Nested Table</title>
+  <title>Styled Nested Table - Tabulator</title>
   
-  <!-- Tabulator CSS & JS -->
+  <!-- Tabulator CSS -->
   <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator.min.css" rel="stylesheet">
+  <!-- Tabulator JS -->
   <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
 
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 30px;
-      background-color: #f9f9f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f1f3f6;
+      padding: 40px;
     }
 
     h2 {
-      color: #333;
+      color: #2b2b2b;
+      margin-bottom: 25px;
     }
 
     #main-table {
-      background: #fff;
-      border-radius: 6px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
     }
 
-    .sub-table {
-      padding: 10px;
-      background-color: #f4f4f4;
-      border: 1px solid #ccc;
-      margin: 10px 0;
-      border-radius: 5px;
+    .tabulator .tabulator-header {
+      background-color: #007bff;
+      color: rgb(0, 0, 0);
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .tabulator-row:nth-child(even) {
+      background-color: #f8f9fa;
     }
 
     .expand-btn {
-      background-color: #007bff;
+      background-color: #28a745;
       color: white;
       border: none;
-      padding: 4px 10px;
+      padding: 5px 12px;
       border-radius: 4px;
       cursor: pointer;
+      font-size: 14px;
     }
 
     .expand-btn:hover {
-      background-color: #0056b3;
+      background-color: #218838;
+    }
+
+    .sub-table {
+      padding: 12px;
+      background-color: #ffffff;
+      border-radius: 5px;
+      margin: 10px 0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(-5px);}
+      to {opacity: 1; transform: translateY(0);}
     }
   </style>
 </head>
 <body>
-  <h2>Customer Orders</h2>
+  <h2>Customer Orders (Enhanced View)</h2>
   <div id="main-table"></div>
 
   <script>
-    // Sample data
     const rawData = [
-      {
-        CustomerID: "CUST001",
-        CustomerName: "Alice",
-        ProductName: "Laptop",
-        OrderDate: "2023-06-01",
-        Sales: 1500,
-        Profit: 300,
-      },
-      {
-        CustomerID: "CUST001",
-        CustomerName: "Alice",
-        ProductName: "Mouse",
-        OrderDate: "2023-06-05",
-        Sales: 50,
-        Profit: 10,
-      },
-      {
-        CustomerID: "CUST002",
-        CustomerName: "Bob",
-        ProductName: "Keyboard",
-        OrderDate: "2023-06-10",
-        Sales: 100,
-        Profit: 20,
-      },
-      {
-        CustomerID: "CUST003",
-        CustomerName: "Charlie",
-        ProductName: "Monitor",
-        OrderDate: "2023-06-15",
-        Sales: 300,
-        Profit: 60,
-      }
+      { CustomerID: "CUST001", CustomerName: "Alice", ProductName: "Laptop", OrderDate: "2023-06-01", Sales: 1500, Profit: 300 },
+      { CustomerID: "CUST001", CustomerName: "Alice", ProductName: "Mouse", OrderDate: "2023-06-05", Sales: 50, Profit: 10 },
+      { CustomerID: "CUST002", CustomerName: "Bob", ProductName: "Keyboard", OrderDate: "2023-06-10", Sales: 100, Profit: 20 },
+      { CustomerID: "CUST003", CustomerName: "Charlie", ProductName: "Monitor", OrderDate: "2023-06-15", Sales: 300, Profit: 60 }
     ];
 
-    // Group orders by Customer
     const grouped = {};
     rawData.forEach(row => {
       if (!grouped[row.CustomerID]) {
@@ -107,26 +98,26 @@
 
     const tableData = Object.values(grouped);
 
-    // Create Main Tabulator Table
     new Tabulator("#main-table", {
       data: tableData,
       layout: "fitColumns",
       height: "600px",
+      responsiveLayout: "collapse",
       columns: [
-        { title: "Customer ID", field: "CustomerID" },
+        { title: "Customer ID", field: "CustomerID", width: 150 },
         { title: "Customer Name", field: "CustomerName" },
         {
           title: "View Orders",
           formatter: () => "<button class='expand-btn'>Expand</button>",
-          width: 120,
+          width: 130,
+          hozAlign: "center",
           cellClick: function (e, cell) {
             const existing = cell.getRow().getElement().nextSibling;
             if (existing && existing.classList.contains("sub-table")) {
-              existing.remove(); // collapse if already opened
+              existing.remove();
               return;
             }
 
-            // Close others
             document.querySelectorAll(".sub-table").forEach(el => el.remove());
 
             const orders = cell.getRow().getData().Orders;
@@ -138,7 +129,7 @@
               data: orders,
               layout: "fitColumns",
               autoColumns: true,
-              height: "auto"
+              height: "auto",
             });
           }
         }
